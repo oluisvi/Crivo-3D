@@ -7,7 +7,7 @@ Nesta versão do protótipo, os seis previews usam arquivos 3D fornecidos direta
 - Supersonic
 - Spider-Man Urban
 - Heavy Metal Groot
-- Mini Dragon
+- Goku
 - Charizard
 - Frieza
 

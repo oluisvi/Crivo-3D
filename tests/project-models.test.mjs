@@ -8,7 +8,7 @@ const expectedModels = [
   'supersonic.glb',
   'spiderman-urban.glb',
   'heavy-metal-groot.glb',
-  'mini-dragon.glb',
+  'goku.glb',
   'charizard.glb',
   'frieza.glb',
 ]

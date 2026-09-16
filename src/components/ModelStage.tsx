@@ -7,6 +7,7 @@ import type { ConceptProject, ProjectVisual } from '../data/projects'
 type ModelStageProps = {
   project: ConceptProject
   interactive?: boolean
+  animate?: boolean
   className?: string
 }
 
@@ -184,10 +185,15 @@ function disposeObject(root: THREE.Object3D) {
   })
 }
 
-export function ModelStage({ project, interactive = false, className = '' }: ModelStageProps) {
+export function ModelStage({ project, interactive = false, animate = true, className = '' }: ModelStageProps) {
   const mountRef = useRef<HTMLDivElement | null>(null)
+  const animateRef = useRef(animate)
   const [status, setStatus] = useState<'loading' | 'ready' | 'fallback'>('loading')
   const [webglUnavailable, setWebglUnavailable] = useState(false)
+
+  useEffect(() => {
+    animateRef.current = animate
+  }, [animate])
 
   useEffect(() => {
     const mount = mountRef.current
@@ -219,6 +225,12 @@ export function ModelStage({ project, interactive = false, className = '' }: Mod
 
     const stage = new THREE.Group()
     scene.add(stage)
+
+    // Keep the source mesh inside a centered pivot. Some print-oriented files
+    // (notably Groot) have geometry far away from their file origin; rotating
+    // the imported root directly makes the model orbit out of frame.
+    const modelPivot = new THREE.Group()
+    stage.add(modelPivot)
 
     const hemi = new THREE.HemisphereLight(0xf6f6f4, 0x171719, 2.2)
     scene.add(hemi)
@@ -258,6 +270,8 @@ export function ModelStage({ project, interactive = false, className = '' }: Mod
     let disposed = false
     let loadToken = 0
 
+    const renderScene = () => renderer.render(scene, camera)
+
     const fitObject = (object: THREE.Object3D) => {
       object.updateMatrixWorld(true)
       const box = new THREE.Box3().setFromObject(object)
@@ -291,12 +305,16 @@ export function ModelStage({ project, interactive = false, className = '' }: Mod
         return
       }
       if (model) {
-        stage.remove(model)
+        modelPivot.remove(model)
         disposeObject(model)
       }
-      model = object
-      stage.add(object)
-      fitObject(object)
+
+      const centeredModel = new THREE.Group()
+      centeredModel.add(object)
+      model = centeredModel
+      modelPivot.add(centeredModel)
+      fitObject(centeredModel)
+      renderScene()
       setStatus(isFallback ? 'fallback' : 'ready')
     }
 
@@ -359,6 +377,7 @@ export function ModelStage({ project, interactive = false, className = '' }: Mod
       renderer.setSize(width, height, false)
       camera.aspect = width / height
       camera.updateProjectionMatrix()
+      renderScene()
     }
 
     resize()
@@ -373,19 +392,22 @@ export function ModelStage({ project, interactive = false, className = '' }: Mod
     io.observe(mount)
 
     const clock = new THREE.Clock()
-    const animate = () => {
-      raf = requestAnimationFrame(animate)
+    const animateFrame = () => {
+      raf = requestAnimationFrame(animateFrame)
       if (!visible) return
+      if (!interactive && !animateRef.current) return
+
       const elapsed = clock.getElapsedTime()
-      if (model && !interactive && !reducedMotion) {
-        model.rotation.y = Math.sin(elapsed * 0.34) * 0.16 + elapsed * 0.12
-        model.rotation.x = Math.sin(elapsed * 0.24) * 0.03
+      if (model && !interactive && animateRef.current && !reducedMotion) {
+        modelPivot.rotation.y = Math.sin(elapsed * 0.34) * 0.16 + elapsed * 0.12
+        modelPivot.rotation.x = Math.sin(elapsed * 0.24) * 0.03
       }
-      if (!reducedMotion) ring.rotation.z = elapsed * 0.08
+      if (animateRef.current && !reducedMotion) ring.rotation.z = elapsed * 0.08
       controls?.update()
-      renderer.render(scene, camera)
+      renderScene()
     }
-    animate()
+
+    animateFrame()
 
     return () => {
       disposed = true

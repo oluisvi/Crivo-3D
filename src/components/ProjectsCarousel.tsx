@@ -134,6 +134,8 @@ export function ProjectsCarousel() {
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return
+    const target = event.target as HTMLElement
+    if (target.closest('button, a')) return
     pointerStart.current = { id: event.pointerId, x: event.clientX, y: event.clientY }
     movedRef.current = false
     setDragging(true)
@@ -217,8 +219,8 @@ export function ProjectsCarousel() {
                   <div className="project-card__visual">
                     <div className="project-card__grid" aria-hidden="true" />
                     <div className="project-card__ghost-number" aria-hidden="true">{project.number}</div>
-                    {isActive && sectionVisible ? (
-                      <ModelStage project={project} className="project-card__model" />
+                    {sectionVisible && !hidden ? (
+                      <ModelStage project={project} animate={isActive} className="project-card__model" />
                     ) : (
                       <ProjectGlyph visual={project.visual} />
                     )}
