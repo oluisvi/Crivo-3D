@@ -199,16 +199,17 @@ function App() {
               <h2>Mais do que<br /><em>imprimir peças.</em></h2>
             </Reveal>
 
-            <div className="outcomes-grid">
+            <div className="outcomes-list">
               {site.outcomes.map((item, index) => (
-                <Reveal className="outcome-card" key={item.kicker}>
+                <Reveal className="outcome-row" key={item.kicker}>
                   <article>
-                    <div className={`outcome-card__art outcome-card__art--${index + 1}`} aria-hidden="true">
-                      <span /><span /><span /><span />
+                    <div className="outcome-row__meta">
+                      <span className="outcome-row__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                      <p className="outcome-row__kicker">{item.kicker.split(' / ')[1] ?? item.kicker}</p>
                     </div>
-                    <p className="outcome-card__kicker">{item.kicker}</p>
                     <h3>{item.title}</h3>
-                    <p className="outcome-card__body">{item.text}</p>
+                    <p className="outcome-row__body">{item.text}</p>
+                    <span className="outcome-row__line" aria-hidden="true" />
                   </article>
                 </Reveal>
               ))}
