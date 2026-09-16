@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/components/BrandMark.tsx","./src/components/CrivoScene.tsx","./src/components/EntryOverlay.tsx","./src/components/ModelStage.tsx","./src/components/ProjectsCarousel.tsx","./src/components/Reveal.tsx","./src/data/projects.ts","./src/data/site.ts"],"errors":true,"version":"5.8.3"}

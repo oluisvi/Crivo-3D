@@ -1,45 +1,49 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import logoGeometry from '../data/crivoLogoGeometry.json'
 
 type CrivoSceneProps = {
   onReady?: () => void
 }
 
-function createCrivoGeometry() {
-  const shape = new THREE.Shape()
-  const points: Array<[number, number]> = [
-    [1.65, 1.55],
-    [0.15, 1.55],
-    [-0.85, 1.15],
-    [-1.45, 0.35],
-    [-1.45, -0.35],
-    [-0.85, -1.15],
-    [0.15, -1.55],
-    [1.65, -1.55],
-    [1.65, -0.62],
-    [0.35, -0.62],
-    [-0.18, -0.4],
-    [-0.48, 0],
-    [-0.18, 0.4],
-    [0.35, 0.62],
-    [1.65, 0.62],
-  ]
+type LogoPoint = [number, number]
 
-  shape.moveTo(points[0][0], points[0][1])
-  points.slice(1).forEach(([x, y]) => shape.lineTo(x, y))
+const logoCenter = logoGeometry.center as LogoPoint
+const logoScale = logoGeometry.scale
+
+function toWorldPoint([x, y]: LogoPoint): LogoPoint {
+  return [
+    (x - logoCenter[0]) * logoScale,
+    (logoCenter[1] - y) * logoScale,
+  ]
+}
+
+function createLogoGeometry(points: LogoPoint[], depth: number, bevelSize: number) {
+  const shape = new THREE.Shape()
+  const worldPoints = points.map(toWorldPoint)
+  shape.moveTo(worldPoints[0][0], worldPoints[0][1])
+  worldPoints.slice(1).forEach(([x, y]) => shape.lineTo(x, y))
   shape.closePath()
 
   const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.52,
+    depth,
     bevelEnabled: true,
     bevelSegments: 4,
     steps: 1,
-    bevelSize: 0.09,
-    bevelThickness: 0.08,
+    bevelSize,
+    bevelThickness: bevelSize * 0.86,
     curveSegments: 2,
   })
-  geometry.center()
+  geometry.translate(0, 0, -depth / 2)
   return geometry
+}
+
+function createCrivoGeometry() {
+  return createLogoGeometry(logoGeometry.c as LogoPoint[], 0.42, 0.055)
+}
+
+function createFinGeometry(points: LogoPoint[]) {
+  return createLogoGeometry(points, 0.34, 0.035)
 }
 
 export function CrivoScene({ onReady }: CrivoSceneProps) {
@@ -76,19 +80,14 @@ export function CrivoScene({ onReady }: CrivoSceneProps) {
     camera.position.set(0.2, 0.15, 8.2)
 
     const group = new THREE.Group()
-    group.rotation.x = -0.12
-    group.rotation.y = -0.34
+    group.rotation.x = -0.075
+    group.rotation.y = -0.17
     scene.add(group)
 
     const metal = new THREE.MeshStandardMaterial({
       color: 0xc7c8c9,
       metalness: 0.88,
       roughness: 0.28,
-    })
-    const darkMetal = new THREE.MeshStandardMaterial({
-      color: 0x303033,
-      metalness: 0.7,
-      roughness: 0.42,
     })
     const orange = new THREE.MeshStandardMaterial({
       color: 0xe2490e,
@@ -101,26 +100,17 @@ export function CrivoScene({ onReady }: CrivoSceneProps) {
     const cMesh = new THREE.Mesh(createCrivoGeometry(), metal)
     cMesh.castShadow = true
     cMesh.receiveShadow = true
-    cMesh.rotation.z = -0.04
     group.add(cMesh)
 
     const fins = new THREE.Group()
-    fins.position.set(1.15, -0.93, 0.12)
-    fins.rotation.z = -0.04
-    for (let i = 0; i < 4; i += 1) {
-      const geo = new THREE.BoxGeometry(1.33 - i * 0.06, 0.32, 0.42)
-      const fin = new THREE.Mesh(geo, orange)
-      fin.position.set(i * 0.16, -i * 0.37, 0)
-      fin.rotation.z = -0.1
+    ;(logoGeometry.fins as LogoPoint[][]).forEach((points) => {
+      const fin = new THREE.Mesh(createFinGeometry(points), orange)
+      fin.position.z = 0.055
       fin.castShadow = true
+      fin.receiveShadow = true
       fins.add(fin)
-    }
+    })
     group.add(fins)
-
-    const innerPlate = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.12, 0.32), darkMetal)
-    innerPlate.position.set(0.98, -0.58, -0.08)
-    innerPlate.rotation.z = -0.14
-    group.add(innerPlate)
 
     const floor = new THREE.Mesh(
       new THREE.CircleGeometry(3.8, 64),
