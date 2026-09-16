@@ -274,6 +274,8 @@ export function ModelStage({ project, interactive = false, className = '' }: Mod
       camera.near = Math.max(distance / 120, 0.02)
       camera.far = Math.max(distance * 35, 80)
       camera.updateProjectionMatrix()
+      camera.lookAt(0, 0, 0)
+      camera.updateMatrixWorld()
 
       if (controls) {
         controls.target.set(0, 0, 0)
