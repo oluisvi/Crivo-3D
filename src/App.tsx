@@ -3,6 +3,7 @@ import { BrandMark } from './components/BrandMark'
 import { CrivoScene } from './components/CrivoScene'
 import { EntryOverlay } from './components/EntryOverlay'
 import { Reveal } from './components/Reveal'
+import { ProjectsCarousel } from './components/ProjectsCarousel'
 import { site } from './data/site'
 
 function ArrowIcon() {
@@ -70,6 +71,7 @@ function App() {
         <nav className={`floating-nav__links ${menuOpen ? 'is-open' : ''}`} aria-label="Navegação principal">
           <a href="#crivo" onClick={closeMenu}>O Crivo</a>
           <a href="#processo" onClick={closeMenu}>Processo</a>
+          <a href="#projetos" onClick={closeMenu}>Projetos</a>
           <a href="#sobre" onClick={closeMenu}>Sobre</a>
           <a className="nav-cta" href={site.instagram} target="_blank" rel="noreferrer" onClick={closeMenu}>
             Falar com a Crivo <ArrowIcon />
@@ -111,7 +113,7 @@ function App() {
           </div>
 
           <div className="hero__footnote" aria-hidden="true">
-            <span>01 / 06</span>
+            <span>01 / 07</span>
             <span>role para descobrir</span>
           </div>
         </section>
@@ -188,10 +190,12 @@ function App() {
           </div>
         </section>
 
+        <ProjectsCarousel />
+
         <section className="outcomes-section">
           <div className="section-shell">
             <Reveal className="outcomes-section__head">
-              <p className="section-index">05 / O QUE GANHA FORMA</p>
+              <p className="section-index">06 / O QUE GANHA FORMA</p>
               <h2>Mais do que<br /><em>imprimir peças.</em></h2>
             </Reveal>
 
@@ -219,7 +223,7 @@ function App() {
           </div>
           <div className="section-shell story-section__layout">
             <Reveal>
-              <p className="section-index">06 / A HISTÓRIA</p>
+              <p className="section-index">07 / A HISTÓRIA</p>
               <h2>Toda grande ideia começa com um <em>primeiro passo.</em></h2>
             </Reveal>
             <Reveal className="story-section__copy">

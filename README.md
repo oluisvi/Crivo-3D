@@ -56,3 +56,9 @@ O hero 3D pré-compila a cena e comunica prontidão somente após múltiplos fra
 ## Observação de conteúdo
 
 Este é um MVP visual baseado apenas nas informações fornecidas antes do contato com a empresa. Não inclui preços, materiais específicos, prazos, catálogo formal, telefone, e-mail ou promessas técnicas não confirmadas.
+
+## Projetos conceito + viewer 3D
+
+A cena `05 / POSSIBILIDADES` adiciona um carrossel em profundidade com swipe/drag, teclado e previews 3D carregados sob demanda. Os modelos demonstrativos externos não são apresentados como trabalhos já realizados pela Crivo; a proveniência está documentada em `CREDITS-3D.md`.
+
+O viewer reutiliza a dependência `three` já existente e possui fallback procedural caso um GLB externo não carregue.
